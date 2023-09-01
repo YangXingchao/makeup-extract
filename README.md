@@ -14,6 +14,7 @@ The PyTorch code for the following paper:
 4. Nvdiffrast
 
 ## Installation
+Run the following commands for installing others packages:
 ```
 pip install -r requirements.txt
 ```
