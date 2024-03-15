@@ -10,11 +10,11 @@ The PyTorch code for the following paper:
 
 ## Prerequisites
 1. Python3
-2. PyTorch with CUDA 10.2
+2. PyTorch with CUDA
 4. Nvdiffrast
 
 ## Installation
-Run the following commands for installing others packages:
+Run the following commands for installing other packages:
 ```
 pip install -r requirements.txt
 ```
@@ -36,7 +36,7 @@ Put the [trained models](https://drive.google.com/drive/folders/1lwkR9JcrbZ7fNyl
 
 ### Demo  
 Perform a sequence of processes on ```sample_img.jpg``` in the ```sample``` folder
-1. Detect the landmark, crop the image so that it aligns the face. Then obtain an image of the skin area:
+1. Detect the landmark, and crop the image so that it aligns with the face. Then obtain an image of the skin area:
 ```
 python step_0_preprocess.py
 ```
