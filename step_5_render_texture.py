@@ -13,10 +13,10 @@ from utils.mm_util import compute_mm
 from utils.render_util import compute_img_render, compute_uv_render
 
 
-def get_uncrop_tex(tex_path, mask_region, tex_w, tex_h, uv_size, uv_crop_pos):
+def get_uncrop_tex(tex_path, uncrop_mask, tex_w, tex_h, uv_size, uv_crop_pos):
     tex_raw = cv2.imread(tex_path)
     tex_raw = cv2.resize(tex_raw, (tex_w, tex_h))
-    tex_raw = tex_raw * mask_region
+    tex_raw = tex_raw * uncrop_mask
     tex = np.zeros([uv_size, uv_size, 3])
     tex[uv_crop_pos[1]:uv_crop_pos[1] + tex_h, uv_crop_pos[0]:uv_crop_pos[0] + tex_w, :] = tex_raw
     tex = torch.Tensor(tex.astype(np.float32) / 255.0)
@@ -69,13 +69,6 @@ if __name__ == '__main__':
     rend_uv_mask = cv2.resize(fit_uv_mask, (unwarp_uv_size, unwarp_uv_size))
     rend_uv_mask = torch.tensor(rend_uv_mask.astype(np.float32) / 255.0)[None].to(device)
     
-    # get mask for rendering
-    mask_region = cv2.imread(config.SKIN_MASK_CROP_PATH)
-    mask_region = cv2.resize(mask_region, (uv_crop_w, uv_crop_h))
-    mask_region = cv2.cvtColor(mask_region, cv2.COLOR_BGR2GRAY)
-    _, mask_region = cv2.threshold(mask_region, 10, 255, cv2.THRESH_BINARY)
-    mask_region = mask_region[..., None] / 255.
-    
     # mm param
     fit_param = np.load(args.mm_param_path)
     id = torch.from_numpy(fit_param['id']).float().to(device)
@@ -103,12 +96,19 @@ if __name__ == '__main__':
     rast_out, _ = dr.rasterize(glctx, v_cam, tri, resolution=[fit_size, fit_size])
     texc, _ = dr.interpolate(uvs.contiguous(), rast_out, uv_ids.contiguous())
     
+    # get uncropped mask
+    uncrop_mask = cv2.imread(config.SKIN_MASK_CROP_PATH)
+    uncrop_mask = cv2.resize(uncrop_mask, (uv_crop_w, uv_crop_h))
+    uncrop_mask = cv2.cvtColor(uncrop_mask, cv2.COLOR_BGR2GRAY)
+    _, uncrop_mask = cv2.threshold(uncrop_mask, 10, 255, cv2.THRESH_BINARY)
+    uncrop_mask = uncrop_mask[..., None] / 255.
+    
     # prepare texture for rendering
-    tex_bare = get_uncrop_tex(args.uv_bare_skin_path, mask_region, uv_crop_w, uv_crop_h, unwarp_uv_size, uv_crop_pos).to(device)
-    tex_alpha = get_uncrop_tex(args.uv_make_alpha_path, mask_region, uv_crop_w, uv_crop_h, unwarp_uv_size, uv_crop_pos).to(device)
-    tex_make = get_uncrop_tex(args.uv_make_blend_path, mask_region, uv_crop_w, uv_crop_h, unwarp_uv_size, uv_crop_pos).to(device)
-    tex_diff = get_uncrop_tex(args.uv_diffuse_shading_path, mask_region, uv_crop_w, uv_crop_h, unwarp_uv_size, uv_crop_pos).to(device)
-    tex_spec = get_uncrop_tex(args.uv_specular_shading_path, mask_region, uv_crop_w, uv_crop_h, unwarp_uv_size, uv_crop_pos).to(device)
+    tex_bare = get_uncrop_tex(args.uv_bare_skin_path, uncrop_mask, uv_crop_w, uv_crop_h, unwarp_uv_size, uv_crop_pos).to(device)
+    tex_alpha = get_uncrop_tex(args.uv_make_alpha_path, uncrop_mask, uv_crop_w, uv_crop_h, unwarp_uv_size, uv_crop_pos).to(device)
+    tex_make = get_uncrop_tex(args.uv_make_blend_path, uncrop_mask, uv_crop_w, uv_crop_h, unwarp_uv_size, uv_crop_pos).to(device)
+    tex_diff = get_uncrop_tex(args.uv_diffuse_shading_path, uncrop_mask, uv_crop_w, uv_crop_h, unwarp_uv_size, uv_crop_pos).to(device)
+    tex_spec = get_uncrop_tex(args.uv_specular_shading_path, uncrop_mask, uv_crop_w, uv_crop_h, unwarp_uv_size, uv_crop_pos).to(device)
     
     # texture composition
     tex_remake = tex_bare * (1 - tex_alpha) + tex_make
