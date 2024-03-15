@@ -57,7 +57,7 @@ python step_3_material_refinement.py
 python step_4_makeup_extraction.py
 ```
 
-1. **Render face using extracted textures**
+5. **Render face using extracted textures**
 ```
 python step_5_render_texture.py
 ```
