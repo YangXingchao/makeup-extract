@@ -65,5 +65,6 @@ if __name__ == '__main__':
 
     # segment
     seg_size = config.SEG_SIZE
-    seg_img = segment(out_aligned_img_path, seg_size)
+    seg_img, mask_img = segment(out_aligned_img_path, seg_size)
     cv2.imwrite(f'{out_dir}/segmented_img.png', seg_img)
+    cv2.imwrite(f'{out_dir}/mask_img.png', mask_img)

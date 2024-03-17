@@ -7,7 +7,7 @@ import nvdiffrast.torch as dr
 import torch
 
 import config
-from utils.img_util import save_tensor
+from utils.img_util import save_tensor, tensor_to_img
 from utils.mm_layer import get_mm
 from utils.mm_util import compute_mm
 from utils.render_util import compute_img_render, compute_uv_render
@@ -37,6 +37,10 @@ if __name__ == '__main__':
                         help='Input diffuse shading')
     parser.add_argument('--uv_specular_shading_path', default='./results/material_refinement/rnsr_refine.png',
                         help='Input diffuse shading')
+    parser.add_argument('--input_aligned_image', default='./results/aligned_img.png',
+                        help='Input aligned image')
+    parser.add_argument('--aligned_image_mask_path', default='./results/mask_img.png',
+                        help='Input aligned image mask')
     parser.add_argument('--out_dir', '-o', default='./results/render_texture', help='Output directory')
     args = parser.parse_args()
 
@@ -122,3 +126,15 @@ if __name__ == '__main__':
     img_compose= dr.texture(tex_compose[None], texc, filter_mode='linear')
     img_compose = img_compose * torch.clamp(rast_out[..., -1:], 0, 1)
     save_tensor(img_compose[0], f'{out_dir}/img_compose.png')
+    
+    # blend rendered image and background
+    img_aligned = cv2.imread(args.input_aligned_image)
+    img_aligned = cv2.resize(img_aligned, (fit_size, fit_size))
+    img_aligned_mask = cv2.imread(args.aligned_image_mask_path) 
+    img_aligned_mask = cv2.resize(img_aligned_mask, (fit_size, fit_size)) / 255.
+    img_aligned_mask = cv2.erode(img_aligned_mask, np.ones((3, 3), np.uint8), iterations=1)
+    img_aligned_mask = cv2.GaussianBlur(img_aligned_mask, (3, 3), 1)
+    img_aligned_compose = tensor_to_img(img_compose[0])
+    
+    img_with_bg = img_aligned_compose * img_aligned_mask + img_aligned * (1 - img_aligned_mask)
+    cv2.imwrite(f'{out_dir}/img_compose_with_bg.png', img_with_bg)

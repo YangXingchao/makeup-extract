@@ -62,7 +62,7 @@ def vis_parsing_maps(im, parsing_anno, stride):
     face_masked = cv2.bitwise_and(im, im, mask=inv_mask)
     face_masked = cv2.cvtColor(face_masked, cv2.COLOR_RGB2BGR)
 
-    return face_masked
+    return face_masked, inv_mask
 
 
 def segment(img_path, img_size):
@@ -88,5 +88,5 @@ def segment(img_path, img_size):
         out = net(img)[0]
         parsing = out.squeeze(0).cpu().numpy().argmax(0)
 
-        vis = vis_parsing_maps(image, parsing, stride=1)
-        return vis
+        vis, mask = vis_parsing_maps(image, parsing, stride=1)
+        return vis, mask
