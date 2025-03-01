@@ -64,6 +64,11 @@ python step_5_render_texture.py
 
 The results of the execution can be found in the ```results``` folder
 
+## Extracted Makeup UV Materials
+You can download the extracted makeup UV materials from [makeup_extract_dataset](https://drive.google.com/file/d/1KC1eUU8HLD7y_DdomSzGKJWR2Hmapzr4/view?usp=drive_link).
+This dataset is extracted from 3068 images (from the MT dataset and LADN dataset), containing the final materials, including diffuse albedo, diffuse shading, normal, specular shading, makeup bases, makeup alpha, and makeup blend.
+
+
 # Citation
 If you find our work useful for your research, please consider citing our paper:
 ```bibtex
