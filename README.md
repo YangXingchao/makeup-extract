@@ -66,7 +66,23 @@ The results of the execution can be found in the ```results``` folder
 
 ## Extracted Makeup UV Materials
 You can download the extracted makeup UV materials from [makeup_extract_dataset](https://drive.google.com/file/d/1KC1eUU8HLD7y_DdomSzGKJWR2Hmapzr4/view?usp=drive_link).
-This dataset is extracted from 3068 images (from the MT dataset and LADN dataset), containing the final materials, including diffuse albedo, diffuse shading, normal, specular shading, makeup bases, makeup alpha, and makeup blend.
+This dataset is extracted from 3068 images (sourced from MT dataset and LADN dataset).
+The material size is set to 512 for all generated materials.
+
+### Dataset Structure
+
+#### Root Folders
+- 📁 `images/` - Original 2D face input images
+- 📁 `uvs/` - UV texture maps completed by DSD-GAN
+- 📁 `materials/` - Material uv maps obtained through image decomposition
+  - 📁 `albe/` - Diffuse albedo maps
+  - 📁 `diff/` - Diffuse shading maps
+  - 📁 `norm/` - Normal maps
+  - 📁 `spec/` - Specular shading maps
+  - 📁 `bare/` - Base face maps without makeup
+  - 📁 `alpha/` - Makeup alpha/transparency maps
+  - 📁 `bias/` - Makeup Bias maps
+  - 📁 `blend/` - Makeup blending maps
 
 
 # Citation
